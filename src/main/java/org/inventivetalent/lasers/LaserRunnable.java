@@ -137,6 +137,7 @@ public class LaserRunnable extends BukkitRunnable {
 		boolean canReceive = false;
 		int distance = 0;
 
+		//TODO: get rid of data
 		if (xDiff == 0 && zDiff == 0) {
 			if (yDiff > 0) {
 				if (receiver.getData() == 0) {
@@ -211,6 +212,7 @@ public class LaserRunnable extends BukkitRunnable {
 		Vector start = origin.getLocation().toVector();
 		Vector direction = new Vector();
 
+		//TODO: get rid of data
 		switch (origin.getData()) {
 			case 8:
 				start.setX(start.getX() + .5);
@@ -289,6 +291,7 @@ public class LaserRunnable extends BukkitRunnable {
 						double xCorr = 0.5;
 						double zCorr = 0.5;
 
+						//TODO: get rid of data
 						if (mirror.getType()==Material.WALL_BANNER) {// Hanging banner
 							switch (mirror.getData()) {
 								case 2:

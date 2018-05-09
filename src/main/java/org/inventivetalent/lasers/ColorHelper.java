@@ -59,6 +59,7 @@ public class ColorHelper {
 			}
 		}
 
+		//TODO: get rid of data
 		return DyeColor.values().length - (col.getWoolData() + 1);
 	}
 

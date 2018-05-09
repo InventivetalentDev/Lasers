@@ -5,6 +5,7 @@ import org.bukkit.Material;
 import org.bukkit.block.Banner;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
+import org.bukkit.material.Redstone;
 import org.bukkit.util.Vector;
 
 public class BannerHelper {
@@ -25,70 +26,71 @@ public class BannerHelper {
 	}
 
 	public Vector getBannerAngleForData(Material type, byte data) {
+		org.bukkit.material.Banner banner = (org.bukkit.material.Banner) type.getNewData(data);
 		Vector bannerAngle = new Vector();
 
 		if (type == Material.STANDING_BANNER) {
-			switch (data) {
-				case 0:
+			switch (banner.getFacing()) {
+				case SOUTH:
 					bannerAngle.setZ(1);
 					break;
-				case 1:
+				case SOUTH_SOUTH_WEST:
 					bannerAngle.setZ(DEG_45);
 					bannerAngle.setX(-DEG_22_5);
 					break;
-				case 2:
+				case SOUTH_WEST:
 					bannerAngle.setX(-DEG_90);
 					bannerAngle.setZ(DEG_90);
 					break;
-				case 3:
+				case WEST_SOUTH_WEST:
 					bannerAngle.setX(-DEG_45);
 					bannerAngle.setZ(DEG_22_5);
 					break;
 
-				case 4:
+				case WEST:
 					bannerAngle.setX(-1);
 					break;
-				case 5:
+				case WEST_NORTH_WEST:
 					bannerAngle.setX(-DEG_45);
 					bannerAngle.setZ(-DEG_22_5);
 					break;
-				case 6:
+				case NORTH_WEST:
 					bannerAngle.setX(-DEG_90);
 					bannerAngle.setZ(-DEG_90);
 					break;
-				case 7:
+				case NORTH_NORTH_WEST:
 					bannerAngle.setZ(-DEG_45);
 					bannerAngle.setX(-DEG_22_5);
 					break;
 
-				case 8:
+				case NORTH:
 					bannerAngle.setZ(-1);
 					break;
-				case 9:
+				case NORTH_NORTH_EAST:
 					bannerAngle.setZ(-DEG_45);
 					bannerAngle.setX(DEG_22_5);
 					break;
-				case 10:
+				case NORTH_EAST:
 					bannerAngle.setZ(-DEG_90);
 					bannerAngle.setX(DEG_90);
 					break;
-				case 11:
+				case EAST_NORTH_EAST:
 					bannerAngle.setX(DEG_45);
 					bannerAngle.setZ(-DEG_22_5);
 					break;
 
-				case 12:
+				case EAST:
 					bannerAngle.setX(1);
 					break;
-				case 13:
+				case EAST_SOUTH_EAST:
 					bannerAngle.setZ(DEG_22_5);
 					bannerAngle.setX(DEG_45);
 					break;
-				case 14:
+				case SOUTH_EAST:
 					bannerAngle.setZ(DEG_90);
 					bannerAngle.setX(DEG_90);
 					break;
-				case 15:
+				case SOUTH_SOUTH_EAST:
 					bannerAngle.setZ(DEG_45);
 					bannerAngle.setX(DEG_22_5);
 					break;
@@ -98,17 +100,17 @@ public class BannerHelper {
 			}
 		}
 		if (type == Material.WALL_BANNER) {
-			switch (data) {
-				case 2:
+			switch (banner.getAttachedFace().getOppositeFace()) {
+				case SOUTH:
 					bannerAngle.setZ(-1);
 					break;
-				case 3:
+				case NORTH:
 					bannerAngle.setZ(1);
 					break;
-				case 4:
+				case EAST:
 					bannerAngle.setX(-1);
 					break;
-				case 5:
+				case WEST:
 					bannerAngle.setX(1);
 					break;
 
@@ -147,10 +149,16 @@ public class BannerHelper {
 		if ((base = banner.getRelative(BlockFace.DOWN)) == null || base.getType() == Material.AIR) { return data; }
 		if (base.getBlockPower() <= 0) { return 0; }
 
-		byte powerS = base.getRelative(BlockFace.SOUTH).getData();
-		byte powerW = base.getRelative(BlockFace.WEST).getData();
-		byte powerN = base.getRelative(BlockFace.NORTH).getData();
-		byte powerE = base.getRelative(BlockFace.EAST).getData();
+		Block s = base.getRelative(BlockFace.SOUTH);
+		Block w = base.getRelative(BlockFace.WEST);
+		Block n = base.getRelative(BlockFace.NORTH);
+		Block e = base.getRelative(BlockFace.EAST);
+
+		//TODO: get rid of data
+		byte powerS = (s instanceof Redstone) ? base.getRelative(BlockFace.SOUTH).getData() : 0;
+		byte powerW = (w instanceof Redstone) ? base.getRelative(BlockFace.WEST).getData() : 0;
+		byte powerN = (n instanceof Redstone) ? base.getRelative(BlockFace.NORTH).getData() : 0;
+		byte powerE = (e instanceof Redstone) ? base.getRelative(BlockFace.EAST).getData() : 0;
 
 		byte powerA = 0;
 		byte powerB = 0;
