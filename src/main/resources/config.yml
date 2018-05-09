@@ -1,0 +1,48 @@
+laser:
+  #Interval of the laser particles
+  interval: 2
+  #Maximum length of laser beams
+  length: 16
+  #Frequency of the laser particles
+  frequency: 0.25
+  damage:
+    #If lasers damage entities
+    enabled: true
+    #Damage amount
+    amount: 0.25
+    #If entities are set on fire
+    fire: true
+    #Death message
+    message: '%player% tried to stand in front of a laser'
+color:
+  #If mirrors change the laser's color
+  mirror: true
+  #If glass changes the laser's color
+  glass:
+    block: true
+    pane: true
+  #If the colors are mixed. If disabled, the color will be replaced
+  mix: true
+mirrors:
+  #If mirrors are reflective on both sides
+  double: false
+  rotator:
+    #Mode of the Mirror Rotator
+    #Available modes:
+    #'side' - The rotation depends on the side the power is provided from
+    #'strength' - The rotation depends on the signal strength
+    mode: 'side'
+blocked:
+  #If lasers are blocked by non-transparent blocks
+  blocks: true
+   #If lasers are blocked by living entities
+  entities: true
+receiver:
+  signal:
+    #Receiver signal mode
+    #Available modes:
+    #'distance' - signal strength changes based on the distance to the last redirect (e.g. a Mirror)
+    #'color' - signal strength changes based on the laser color (black = 0; red = 1; ...; orange = 14; white = 15)
+    mode: 'distance'
+    #Tolerance for the color mode (How accurate the color detection is)
+    tolerance: 25

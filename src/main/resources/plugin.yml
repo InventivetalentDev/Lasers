@@ -1,0 +1,8 @@
+name: Lasers
+main: org.inventivetalent.lasers.Lasers
+author: inventivetalent
+version: ${project.version}
+
+commands:
+  lasers:
+    description: ""
