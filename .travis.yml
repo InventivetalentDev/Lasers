@@ -1,0 +1,15 @@
+language: java
+jdk:
+- oraclejdk8
+
+script: "mvn deploy --settings settings.xml"
+deploy:
+  provider: releases
+  api_key: 
+    secure: "WEBSpnN4AcFvEgxDHwNE5GKCyzjL4bM8vB6eaj7h6PcCgQ2smV3u9smjeWn7fTIGz7YgZFh/CIEpzbphCrgBAdfLqk8D+H32LmVn/YWYEUlCKs74dpd9Z2XF+XQ0bN1o8RIKwV3+2R1eTkYiUKBnS/EoOs+iYI0ucY+8CF/Ct0zEFgo5gvDCCc+p5xLGpSIRxJUkaSoXFlKDIRSL+L3ehgVNkMLI+/V8idBhw7pZZ1cr9ZZ073SX9D628TSHSoIilPJeNXK8fh3/bi7htOcTvqP8gIln9htmJP2csXpcvIDj0XextG8dU/WcqaKxFDe+XKhzgTdFKd/+dfIOW6W0v9iqaJBb3h9Biw92YS8RQuyascQQPqIzfeeL9vdJUf43DwyvoIgGt0Pfuy1LpJPmRae1zAT2tK+jH9LeSkOHfNVt9p5WQqM30I5vT4u+2Pj5FTWT+bXjS3OXT7JAux+66pQcXH+8tk19tUUvmout1fxBKXwgdMAcIBUeL4ula8LGOkJO62y84ogImRMFw+tIGxEWLfUOeHRlxTTkHVRJGlE9KFRg73u7CH47IZYT/TfyI2Km9zcfoc8429/sgDrS5DohwvrIleVnvezI6QZk1Z7NW6zS9iP8gzuvpZgyTSyDDpOkC2wLd+h4zJ6B+h3XI6ZcxDt25ynlkbnEupKrESo="
+  file_glob: true
+  file: 
+    - "target/Lasers_*.jar"
+  skip_cleanup: true
+  on:
+    tags: true
