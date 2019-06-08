@@ -413,7 +413,7 @@ public class LaserRunnable extends BukkitRunnable {
 				continue;
 			}
 
-			if (Util.entityBoundingBoxContains(Util.getEntityBoundingBox(ent), loc.toVector())) {
+			if (Util.entityBoundingBoxContains(ent, loc.toVector())) {
 				if (this.plugin.laserDamageEnabled) {
 					if (ent instanceof Damageable) {
 						if (this.plugin.laserDamageFire) {
