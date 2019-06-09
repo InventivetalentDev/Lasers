@@ -10,7 +10,7 @@ import org.inventivetalent.boundingbox.BoundingBoxAPI;
 public class Util {
 
 	public static boolean entityBoundingBoxContains(Entity entity, Vector point) {
-		BoundingBox box = BoundingBoxAPI.getBoundingBox(entity);
+		BoundingBox box = BoundingBoxAPI.getAbsoluteBoundingBox(entity);
 		return box.contains(point.getX(), point.getY(), point.getZ());
 	}
 
