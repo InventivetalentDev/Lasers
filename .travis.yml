@@ -2,7 +2,7 @@ language: java
 jdk:
 - oraclejdk8
 
-script: "mvn deploy --settings settings.xml"
+script: "mvn deploy"
 deploy:
   provider: releases
   api_key: 
