@@ -5,8 +5,13 @@ import org.bukkit.Material;
 import org.bukkit.block.Banner;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
-import org.bukkit.material.Redstone;
+import org.bukkit.block.data.AnaloguePowerable;
+import org.bukkit.block.data.BlockData;
+import org.bukkit.block.data.Rotatable;
+import org.bukkit.material.Directional;
 import org.bukkit.util.Vector;
+
+import static org.inventivetalent.lasers.Util.isWallBanner;
 
 public class BannerHelper {
 
@@ -25,12 +30,14 @@ public class BannerHelper {
 		return DyeColor.RED;
 	}
 
-	public Vector getBannerAngleForData(Material type, byte data) {
-		org.bukkit.material.Banner banner = (org.bukkit.material.Banner) type.getNewData(data);
+	public Vector getBannerAngleForData(Material type, BlockData data) {
 		Vector bannerAngle = new Vector();
 
-		if (type == Material.STANDING_BANNER) {
-			switch (banner.getFacing()) {
+		// this took way too long to figure out.
+		boolean isWallBanner = isWallBanner(type);
+
+		if (!isWallBanner) {
+			switch (((Rotatable)data).getRotation()) {
 				case SOUTH:
 					bannerAngle.setZ(1);
 					break;
@@ -99,8 +106,8 @@ public class BannerHelper {
 					break;
 			}
 		}
-		if (type == Material.WALL_BANNER) {
-			switch (banner.getAttachedFace().getOppositeFace()) {
+		if (isWallBanner) {
+			switch (((Directional)data).getFacing()) {
 				case SOUTH:
 					bannerAngle.setZ(-1);
 					break;
@@ -125,7 +132,8 @@ public class BannerHelper {
 	public Vector getAngle(Block banner, Vector laserAngle) {
 		Vector vector = new Vector();
 
-		Vector bannerAngle = this.getBannerAngleForData(banner.getType(), banner.getData());// TODO: remove data - but the banner block doesn't seem to have a getter for rotation
+
+		Vector bannerAngle = this.getBannerAngleForData(banner.getType(), banner.getBlockData());// TODO: remove data - but the banner block doesn't seem to have a getter for rotation
 
 		bannerAngle = bannerAngle.normalize();
 
@@ -142,26 +150,28 @@ public class BannerHelper {
 		return vector;
 	}
 
-	public byte getBannerAngleForPower(Block banner) {
-		byte data = banner.getData();
-		if (banner.getType() != Material.STANDING_BANNER) { return data; }
+	public BlockFace getBannerAngleForPower(Block banner) {
+		BlockData blockData = banner.getBlockData();
+		if (!(blockData instanceof  Rotatable)) { return BlockFace.SOUTH; }
 		Block base = null;
-		if ((base = banner.getRelative(BlockFace.DOWN)) == null || base.getType() == Material.AIR) { return data; }
-		if (base.getBlockPower() <= 0) { return 0; }
+		if ((base = banner.getRelative(BlockFace.DOWN)).isEmpty() || base.getType() == Material.AIR) { return BlockFace.SOUTH; }
+		if (base.getBlockPower() <= 0) { return BlockFace.SOUTH; }
 
-		Block s = base.getRelative(BlockFace.SOUTH);
-		Block w = base.getRelative(BlockFace.WEST);
-		Block n = base.getRelative(BlockFace.NORTH);
-		Block e = base.getRelative(BlockFace.EAST);
+		BlockData s = base.getRelative(BlockFace.SOUTH).getBlockData();
+		BlockData w = base.getRelative(BlockFace.WEST).getBlockData();
+		BlockData n = base.getRelative(BlockFace.NORTH).getBlockData();
+		BlockData e = base.getRelative(BlockFace.EAST).getBlockData();
 
 		//TODO: get rid of data
-		byte powerS = (s instanceof Redstone) ? base.getRelative(BlockFace.SOUTH).getData() : 0;
-		byte powerW = (w instanceof Redstone) ? base.getRelative(BlockFace.WEST).getData() : 0;
-		byte powerN = (n instanceof Redstone) ? base.getRelative(BlockFace.NORTH).getData() : 0;
-		byte powerE = (e instanceof Redstone) ? base.getRelative(BlockFace.EAST).getData() : 0;
+		byte powerS = (byte) ((s instanceof AnaloguePowerable) ? ((AnaloguePowerable) s).getPower() : 0);
+		byte powerW = (byte) ((w instanceof AnaloguePowerable) ?((AnaloguePowerable) w).getPower() : 0);
+		byte powerN = (byte) ((n instanceof AnaloguePowerable) ? ((AnaloguePowerable) n).getPower() : 0);
+		byte powerE = (byte) ((e instanceof AnaloguePowerable) ? ((AnaloguePowerable) e).getPower() : 0);
 
 		byte powerA = 0;
 		byte powerB = 0;
+
+		byte data = 0;
 
 		byte side = 0;
 		if (powerS >= 1 && powerN == 0 && powerE == 0) {
@@ -207,6 +217,45 @@ public class BannerHelper {
 			data = (byte) base.getBlockPower();
 		}
 
-		return data;
+		return dataToRotation(data);
 	}
+
+	public BlockFace dataToRotation(byte data) {
+		switch (data) {
+			case 0:
+			default:
+				return BlockFace.SOUTH;
+			case 1:
+				return BlockFace.SOUTH_SOUTH_WEST;
+			case 2:
+				return BlockFace.SOUTH_WEST;
+			case 3:
+				return BlockFace.WEST_SOUTH_WEST;
+			case 4:
+				return BlockFace.WEST;
+			case 5:
+				return BlockFace.WEST_NORTH_WEST;
+			case 6:
+				return BlockFace.NORTH_WEST;
+			case 7:
+				return BlockFace.NORTH_NORTH_WEST;
+			case 8:
+				return BlockFace.NORTH;
+			case 9:
+				return BlockFace.NORTH_NORTH_EAST;
+			case 10:
+				return BlockFace.NORTH_EAST;
+			case 11:
+				return BlockFace.EAST_NORTH_EAST;
+			case 12:
+				return BlockFace.EAST;
+			case 13:
+				return BlockFace.EAST_SOUTH_EAST;
+			case 14:
+				return BlockFace.SOUTH_EAST;
+			case 15:
+				return BlockFace.SOUTH_SOUTH_EAST;
+		}
+	}
+
 }

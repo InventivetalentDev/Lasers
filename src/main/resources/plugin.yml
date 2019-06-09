@@ -2,6 +2,7 @@ name: Lasers
 main: org.inventivetalent.lasers.Lasers
 author: inventivetalent
 version: ${project.version}
+api-version: '1.13'
 
 commands:
   lasers:

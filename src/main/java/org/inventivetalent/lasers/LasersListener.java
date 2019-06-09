@@ -7,6 +7,7 @@ import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.Dispenser;
 import org.bukkit.block.Dropper;
+import org.bukkit.block.data.Rotatable;
 import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -25,6 +26,8 @@ import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.metadata.MetadataValue;
+
+import static org.inventivetalent.lasers.Util.isBanner;
 
 public class LasersListener implements Listener {
 
@@ -55,11 +58,19 @@ public class LasersListener implements Listener {
 	public void on(PlayerInteractEvent event) {
 		if (event.isCancelled()) { return; }
 		if (event.getClickedBlock() == null) { return; }
+		boolean isRotator=false;
 		if (event.getAction() == Action.RIGHT_CLICK_AIR || event.getAction() == Action.RIGHT_CLICK_BLOCK) {
-			if (plugin.items.LASER_EMITTER.getType() == event.getClickedBlock().getType() || plugin.items.LASER_RECEIVER.getType() == event.getClickedBlock().getType() || plugin.items.MIRROR_ROTATOR.getType() == event.getClickedBlock().getType()) {
+			if (plugin.items.LASER_EMITTER.getType() == event.getClickedBlock().getType()
+					|| plugin.items.LASER_RECEIVER.getType() == event.getClickedBlock().getType()
+					|| plugin.items.MIRROR_ROTATOR.getType() == event.getClickedBlock().getType()) {
 				if (event.getClickedBlock().hasMetadata("Lasers")) {
-					event.setUseInteractedBlock(Event.Result.DENY);
-					event.setUseItemInHand(Event.Result.ALLOW);
+					if (plugin.items.MIRROR_ROTATOR.getType() == event.getClickedBlock().getType() && event.getItem() != null && isBanner(event.getItem().getType()) && event.getPlayer().isSneaking()) {// sneaking, because you can't place blocks on dispensers otherwise
+						event.setUseInteractedBlock(Event.Result.DEFAULT);
+						event.setUseItemInHand(Event.Result.DEFAULT);
+					}else {
+						event.setUseInteractedBlock(Event.Result.DENY);
+						event.setUseItemInHand(Event.Result.ALLOW);
+					}
 				}
 			}
 		}
@@ -78,7 +89,7 @@ public class LasersListener implements Listener {
 			event.getBlock().setMetadata("Lasers", new FixedMetadataValue(this.plugin, plugin.items.LASER_EMITTER));
 			LaserRunnable.lasers.add(event.getBlock());
 			if (event.getBlock().getState() instanceof InventoryHolder) {
-				((InventoryHolder) event.getBlock().getState()).getInventory().addItem(new ItemStack(Material.WEB, 64, (short) 1));
+				((InventoryHolder) event.getBlock().getState()).getInventory().addItem(new ItemStack(Material.COBWEB, 64));
 			}
 		}
 		if (plugin.items.LASER_RECEIVER.isSimilar(event.getItemInHand())) {
@@ -87,10 +98,12 @@ public class LasersListener implements Listener {
 		}
 		if (plugin.items.MIRROR_ROTATOR.isSimilar(event.getItemInHand())) {
 			event.getBlock().setMetadata("Lasers", new FixedMetadataValue(this.plugin, plugin.items.MIRROR_ROTATOR));
-			event.getBlock().setData((byte) 1);// Face up (off)
+			org.bukkit.block.data.type.Dispenser dispenser = (org.bukkit.block.data.type.Dispenser) event.getBlock().getBlockData();
+			dispenser.setFacing(BlockFace.UP);
+			event.getBlock().setBlockData(dispenser);
 			LaserRunnable.lasers.add(event.getBlock());
 			if (event.getBlock().getState() instanceof InventoryHolder) {
-				((InventoryHolder) event.getBlock().getState()).getInventory().addItem(new ItemStack(Material.WEB, 64, (short) 1));
+				((InventoryHolder) event.getBlock().getState()).getInventory().addItem(new ItemStack(Material.COBWEB, 64));
 			}
 		}
 	}
@@ -166,17 +179,21 @@ public class LasersListener implements Listener {
 				event.setCancelled(true);
 				event.setItem(new ItemStack(Material.AIR));
 				Block up = event.getBlock().getRelative(BlockFace.UP);
-				if (event.getBlock().getData() != 1 && event.getBlock().getData() != 9) {// 1 = off, 9 = on  //TODO: replace data
-					this.plugin.getLogger().warning("A invalid MirrorRotator was triggered but has a data value of " + event.getBlock().getData() + "!");
-					return;
-				}
-				if (up.getType() == Material.STANDING_BANNER) {
+//				if (event.getBlock().getData() != 1 && event.getBlock().getData() != 9) {// 1 = off, 9 = on  //TODO: replace data
+//					this.plugin.getLogger().warning("A invalid MirrorRotator was triggered but has a data value of " + event.getBlock().getData() + "!");
+//					return;
+//				}
+				if (up.getBlockData()  instanceof Rotatable/* standing */) {
+					Rotatable rotatable = (Rotatable) up.getBlockData();
 					//TODO: replace data
-					byte newData = this.plugin.bannerHelper.getBannerAngleForPower(up);
-					if (newData != up.getData()) {
+					BlockFace newFace = this.plugin.bannerHelper.getBannerAngleForPower(up);
+					if (newFace != rotatable.getRotation()) {
 						up.getWorld().playSound(event.getBlock().getLocation(), Sound.BLOCK_PISTON_EXTEND, 1, 1);
-						up.setData(newData);
-						event.getBlock().setData((byte) 1);// Turn the dispenser off, so it can be triggered again
+						rotatable.setRotation(newFace);
+						up.setBlockData(rotatable);
+						org.bukkit.block.data.type.Dispenser dispenser = (org.bukkit.block.data.type.Dispenser)event.getBlock().getBlockData();
+						dispenser.setTriggered(false);// Turn the dispenser off, so it can be triggered again
+						event.getBlock().setBlockData(dispenser);
 						up.getWorld().playSound(event.getBlock().getLocation(), Sound.BLOCK_PISTON_CONTRACT, 1, 1);
 					}
 				}

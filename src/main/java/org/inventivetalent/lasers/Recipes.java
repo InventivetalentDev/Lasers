@@ -31,7 +31,7 @@ public class Recipes {
 		LASER_EMITTER.setIngredient('s', Material.STONE);
 		LASER_EMITTER.setIngredient('g', Material.GLASS);
 		LASER_EMITTER.setIngredient('c', Material.DIAMOND);// Laser Crystal
-		LASER_EMITTER.setIngredient('t', Material.REDSTONE_TORCH_ON);
+		LASER_EMITTER.setIngredient('t', Material.REDSTONE_TORCH);
 
 		/* Laser Receiver */
 		LASER_RECEIVER = new ShapedRecipe(new NamespacedKey(this.plugin, "laser_receiver"), this.plugin.items.LASER_RECEIVER);
@@ -39,15 +39,15 @@ public class Recipes {
 		LASER_RECEIVER.setIngredient('s', Material.STONE);
 		LASER_RECEIVER.setIngredient('g', Material.GLASS);
 		LASER_RECEIVER.setIngredient('c', Material.DIAMOND);// Laser Crystal
-		LASER_RECEIVER.setIngredient('t', Material.REDSTONE_COMPARATOR);
+		LASER_RECEIVER.setIngredient('t', Material.COMPARATOR);
 
 		/* Mirror Rotator */
 		MIRROR_ROTATOR = new ShapedRecipe(new NamespacedKey(this.plugin, "mirror_rotator"), this.plugin.items.MIRROR_ROTATOR);
 		MIRROR_ROTATOR.shape("rpr", "ptp", "cpc");
 		MIRROR_ROTATOR.setIngredient('r', Material.REDSTONE);
-		MIRROR_ROTATOR.setIngredient('p', Material.PISTON_BASE);
-		MIRROR_ROTATOR.setIngredient('t', Material.REDSTONE_TORCH_ON);
-		MIRROR_ROTATOR.setIngredient('c', Material.REDSTONE_COMPARATOR);
+		MIRROR_ROTATOR.setIngredient('p', Material.PISTON);
+		MIRROR_ROTATOR.setIngredient('t', Material.REDSTONE_TORCH);
+		MIRROR_ROTATOR.setIngredient('c', Material.COMPARATOR);
 
 		inject();
 	}

@@ -54,6 +54,8 @@
                                     <include>org.json:json</include>
                                     <include>org.inventivetalent:pluginannotations**</include>
                                     <include>org.inventivetalent:reflectionhelper**</include>
+                                    <include>org.inventivetalent:boundingboxapi**</include>
+                                    <include>org.inventivetalent:vectors**</include>
                                     <include>org.inventivetalent:lasers**</include>
                                 </includes>
                             </artifactSet>
@@ -65,6 +67,14 @@
                                 <relocation>
                                     <pattern>org.inventivetalent.reflection</pattern>
                                     <shadedPattern>org.inventivetalent.lasers.reflection</shadedPattern>
+                                </relocation>
+                                <relocation>
+                                    <pattern>org.inventivetalent.boundingbox</pattern>
+                                    <shadedPattern>org.inventivetalent.lasers.boundingbox</shadedPattern>
+                                </relocation>
+                                <relocation>
+                                    <pattern>org.inventivetalent.vectors</pattern>
+                                    <shadedPattern>org.inventivetalent.lasers.vectors</shadedPattern>
                                 </relocation>
                                 <relocation>
                                     <pattern>org.json</pattern>
@@ -91,7 +101,7 @@
         <dependency>
             <groupId>org.spigotmc</groupId>
             <artifactId>spigot-api</artifactId>
-            <version>1.13-R0.1-SNAPSHOT</version>
+            <version>1.13.2-R0.1-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
         <dependency>

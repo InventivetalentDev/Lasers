@@ -2,6 +2,9 @@ package org.inventivetalent.lasers;
 
 import org.bukkit.*;
 import org.bukkit.block.Block;
+import org.bukkit.block.data.BlockData;
+import org.bukkit.block.data.Directional;
+import org.bukkit.block.data.Openable;
 import org.bukkit.entity.Damageable;
 import org.bukkit.entity.Entity;
 import org.bukkit.inventory.Inventory;
@@ -16,6 +19,8 @@ import org.bukkit.util.Vector;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+
+import static org.inventivetalent.lasers.Util.*;
 
 public class LaserRunnable extends BukkitRunnable {
 
@@ -197,7 +202,7 @@ public class LaserRunnable extends BukkitRunnable {
 			for (int slot = 0; slot < inv.getSize(); slot++) {
 				int c = Math.max(0, Math.min(curr, inv.getMaxStackSize()));
 				if (c > 0) {
-					inv.setItem(slot, new ItemStack(Material.WEB, c, (short) 1));
+					inv.setItem(slot, new ItemStack(Material.COBWEB, c));
 				} else {
 					inv.setItem(slot, null);
 					break;
@@ -279,31 +284,33 @@ public class LaserRunnable extends BukkitRunnable {
 			if (d > .5) {
 				if (!this.canLaserPass(destination, loc)) {
 					Block mirror = loc.clone().subtract(.5, 0, .5).getBlock();
-					if ((mirror.getType() == Material.STANDING_BANNER//
-							|| (mirror = loc.clone().subtract(0, 1, 0).getBlock()).getType() == Material.STANDING_BANNER//
-							|| (mirror = destination).getType() == Material.STANDING_BANNER//
-							|| (mirror = destination).getType() == Material.WALL_BANNER)//
-							) {
+					double originalHeight = mirror.getLocation().getY();
+					BlockData mirrorData = mirror.getBlockData();
+					if ((isStandingBanner(mirror.getType())//
+							|| isStandingBanner((mirror = loc.clone().subtract(0, 1, 0).getBlock()).getType())//
+							|| isStandingBanner((mirror = destination).getType())//
+							|| isWallBanner((mirror = destination).getType()))//
+					) {
 						Vector rotation = this.plugin.bannerHelper.getAngle(mirror, direction.clone());
+						DyeColor color = plugin.colorMirror ? this.plugin.bannerHelper.getColor(mirror) : DyeColor.RED;
 
 						mirror = loc.clone().getBlock();
 
 						double xCorr = 0.5;
 						double zCorr = 0.5;
 
-						//TODO: get rid of data
-						if (mirror.getType()==Material.WALL_BANNER) {// Hanging banner
-							switch (mirror.getData()) {
-								case 2:
+						if (mirrorData instanceof Directional) {// Hanging banner
+							switch (((Directional) mirrorData).getFacing()) {
+								case NORTH:
 									zCorr = 0.5;
 									break;
-								case 3:
+								case SOUTH:
 									zCorr = 0.4;
 									break;
-								case 4:
+								case WEST:
 									xCorr = 0.7;
 									break;
-								case 5:
+								case EAST:
 									xCorr = 0.3;
 									break;
 								default:
@@ -321,7 +328,6 @@ public class LaserRunnable extends BukkitRunnable {
 						}
 						direction.copy(rotation);
 						if (this.plugin.colorMirror) {
-							DyeColor color = this.plugin.bannerHelper.getColor(mirror);
 							if (this.plugin.colorMix) {
 								currentColor = currentColor.mixColors(color.getColor());
 							} else {
@@ -333,9 +339,9 @@ public class LaserRunnable extends BukkitRunnable {
 						break;
 					}
 				}
-				if (this.plugin.colorGlassBlock && destination.getType() == Material.STAINED_GLASS || this.plugin.colorGlassPane && destination.getType() == Material.STAINED_GLASS_PANE) {
+				if (this.plugin.colorGlassBlock && isStainedGlass(destination.getType()) || this.plugin.colorGlassPane && isStainedGlass(destination.getType())) {
 					if (!inGlass) {
-						DyeColor color = DyeColor.getByWoolData(destination.getData());
+						DyeColor color = getColorableBlockColor(destination.getType());
 						if (this.plugin.colorMix) {
 							currentColor = currentColor.mixColors(color.getColor());
 						} else {
@@ -349,14 +355,8 @@ public class LaserRunnable extends BukkitRunnable {
 			}
 			lastVector = vec;
 			try {
-				loc.getWorld().spawnParticle(
-						Particle.REDSTONE,
-						loc,
-						0,
-						particleColor(currentColor.getRed()),
-						particleColor(currentColor.getGreen()),
-						particleColor(currentColor.getBlue()),
-						1);
+				Particle.DustOptions dustOptions = new Particle.DustOptions(currentColor, 1);
+				loc.getWorld().spawnParticle(Particle.REDSTONE, loc, 0, dustOptions);
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
@@ -381,28 +381,20 @@ public class LaserRunnable extends BukkitRunnable {
 			if (block.getType().isTransparent()) {
 				passMaterial = true;
 			}
-			if (block.getType() == Material.GLASS) {
+			if (isGlass(block.getType())) {
 				passMaterial = true;
 			}
-			if (block.getType() == Material.THIN_GLASS) {
+			if (block.getType() == Material.BARRIER) {// Barriers
 				passMaterial = true;
 			}
-			if (block.getType() == Material.STAINED_GLASS) {
-				passMaterial = true;
-			}
-			if (block.getType() == Material.STAINED_GLASS_PANE) {
-				passMaterial = true;
-			}
-			if (block.getType()==Material.BARRIER) {// Barriers
-				passMaterial = true;
-			}
-			if (block.getTypeId() == 107 || block.getTypeId() >= 183 && block.getTypeId() <= 187) {// Fence gates  //TODO: update to Material & add new fence types
-				if (block.getData() >= 4) {// Gate is open
+
+			if (block.getBlockData() instanceof Openable) {// Fence gates  //TODO: update to Material & add new fence types
+				if (((Openable) block.getBlockData()).isOpen()) {// Gate is open
 					passMaterial = true;
 				}
 			}
 		}
-		if (loc.clone().subtract(0, 1, 0).getBlock().getTypeId() == 176) {
+		if (isStandingBanner(loc.clone().subtract(0, 1, 0).getBlock().getType())) {
 			passMaterial = false;
 		}
 		if (!passMaterial) { return false; }
@@ -422,7 +414,7 @@ public class LaserRunnable extends BukkitRunnable {
 							}
 						}
 						((Damageable) ent).damage(this.plugin.laserDamageAmount);
-						((Damageable) ent).setMetadata("Laser_Damage", new FixedMetadataValue(this.plugin,this.plugin.laserDamageAmount));
+						((Damageable) ent).setMetadata("Laser_Damage", new FixedMetadataValue(this.plugin, this.plugin.laserDamageAmount));
 					}
 				}
 				if (this.plugin.blockedEntities) { return false; }
@@ -434,4 +426,5 @@ public class LaserRunnable extends BukkitRunnable {
 		}
 		return true;
 	}
+
 }
