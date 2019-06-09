@@ -117,11 +117,6 @@
 
         <dependency>
             <groupId>org.inventivetalent</groupId>
-            <artifactId>pluginannotations</artifactId>
-            <version>1.4.6</version>
-        </dependency>
-        <dependency>
-            <groupId>org.inventivetalent</groupId>
             <artifactId>reflectionhelper</artifactId>
             <version>1.14.4-SNAPSHOT</version>
         </dependency>

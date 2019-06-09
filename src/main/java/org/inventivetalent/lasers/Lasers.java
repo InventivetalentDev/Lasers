@@ -13,8 +13,6 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.metadata.MetadataValue;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.inventivetalent.pluginannotations.PluginAnnotations;
-import org.inventivetalent.pluginannotations.config.ConfigValue;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -37,45 +35,45 @@ public class Lasers extends JavaPlugin implements Listener {
 
 	public Map<Location, Object[]> unloadedLasers = new HashMap<>();
 
-	@ConfigValue(path = "laser.interval")
 	public int     laserInterval           = 2;
-	@ConfigValue(path = "laser.length")
 	public int     laserLength             = 16;
-	@ConfigValue(path = "laser.frequency")
 	public double  laserFrequency          = 0.25;
-	@ConfigValue(path = "laser.damage.enabled")
 	public boolean laserDamageEnabled      = true;
-	@ConfigValue(path = "laser.damage.amount")
 	public double  laserDamageAmount       = 0.25;
-	@ConfigValue(path = "laser.damage.fire")
 	public boolean laserDamageFire         = true;
-	@ConfigValue(path = "laser.damage.message")
 	public String  laserDamageMessage      = "%player% tried to stand in front of a laser";
-	@ConfigValue(path = "color.mirror")
 	public boolean colorMirror             = true;
-	@ConfigValue(path = "color.glass.block")
 	public boolean colorGlassBlock         = true;
-	@ConfigValue(path = "color.glass.pane")
 	public boolean colorGlassPane          = true;
-	@ConfigValue(path = "color.mix")
 	public boolean colorMix                = true;
-	@ConfigValue(path = "mirrors.double")
 	public boolean mirrorsDouble           = false;
-	@ConfigValue(path = "mirrors.rotator.mode")
 	public String  mirrorRotatorMode       = "side";
-	@ConfigValue(path = "blocked.blocks")
 	public boolean blockedBlocks           = true;
-	@ConfigValue(path = "blocked.entities")
 	public boolean blockedEntities         = true;
-	@ConfigValue(path = "receiver.signal.mode")
 	public String  receiverSignalMode      = "distance";
-	@ConfigValue(path = "receiver.signal.tolerance")
 	public int     receiverSignalTolerance = 25;
 
 	@Override
 	public void onEnable() {
 		saveDefaultConfig();
-		PluginAnnotations.CONFIG.load(this, getClass());
+
+		laserInterval = getConfig().getInt("laser.interval",laserInterval);
+		laserLength = getConfig().getInt("laser.length",laserLength);
+		laserFrequency = getConfig().getDouble("laser.frequency",laserFrequency);
+		laserDamageEnabled = getConfig().getBoolean("laser.damage.enabled",laserDamageEnabled);
+		laserDamageAmount = getConfig().getDouble("laser.damage.amount",laserDamageAmount);
+		laserDamageFire = getConfig().getBoolean("laser.damage.fire", laserDamageFire);
+		laserDamageMessage = getConfig().getString("laser.damage.message", laserDamageMessage);
+		colorMirror = getConfig().getBoolean("color.mirror", colorMirror);
+		colorGlassBlock = getConfig().getBoolean("color.glass.block", colorGlassBlock);
+		colorGlassPane = getConfig().getBoolean("color.glass.pane", colorGlassPane);
+		colorMirror = getConfig().getBoolean("color.mix",colorMix);
+		mirrorsDouble = getConfig().getBoolean("mirrors.double", mirrorsDouble);
+		mirrorRotatorMode = getConfig().getString("mirrors.rotator.mode", mirrorRotatorMode);
+		blockedBlocks = getConfig().getBoolean("blocked.blocks", blockedBlocks);
+		blockedEntities = getConfig().getBoolean("blocked.entities", blockedEntities);
+		receiverSignalMode = getConfig().getString("receiver.signal.mode", receiverSignalMode);
+		receiverSignalTolerance = getConfig().getInt("receiver.signal.tolerance", receiverSignalTolerance);
 
 		this.items = new Items(this);
 		this.items.load();
